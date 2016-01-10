@@ -1,0 +1,100 @@
+"Phrases"
+{
+	"BecomeWarden1"
+	{
+		"en"			"Type !w again to open your warden menu!"
+	}
+	
+	"BecomeWarden2"
+	{
+		"en"			"Type !uw to resign from the warden position!"
+	}
+	
+	"BecomeWarden3"
+	{
+		"#format"		"{1:s}"
+		"en"			"{1} has become warden!"
+	}
+	
+	"BecomeWarden_Denied1"
+	{
+		"en"			"Dead players can not become warden!"
+	}
+	
+	"BecomeWarden_Denied2"
+	{
+		"en"			"Only Counter-Terrorists can become warden!"
+	}
+	
+	"CurrentWarden"
+	{
+		"#format"		"{1:s}"
+		"en"			"Current warden is: {1}"
+	}
+	
+	"ResignWarden1"
+	{
+		"#format"		"{1:s}"
+		"en"			"{1} has resigned!"
+	}
+	
+	"ResignWarden2"
+	{
+		"en"			"You are not warden!"
+	}
+	
+	"RemoveWarden2"
+	{
+		"#format"		"{1:s}"
+		"en"			"{1} has been fired!"
+	}
+	
+	"RemoveWarden_CSGO"
+	{
+		"#format"		"{1:s}"
+		"en"			"<font color='#33CC33'>{1}</font> has been fired!"
+	}
+	
+	"RemoveWarden1"
+	{
+		"#format"		"{1:s}"
+		"en"			"{1} was fired!"
+	}
+	
+	"WardenLeft"
+	{
+		"#format"		"{1:s}"
+		"en"			"{1} has left!"
+	}
+	
+	"WardenDead"
+	{
+		"#format"		"{1:s}"
+		"en"			"{1} has died!"
+	}
+	
+	"WardenMenuTitle"
+	{
+		"en"			"Warden Menu"
+	}
+	
+	"WardenMenuDays"
+	{
+		"en"			"Days"
+	}
+	
+	"WardenMenuGames"
+	{
+		"en"			"Games"
+	}
+	
+	"WardenMenuOther"
+	{
+		"en"			"Other"
+	}
+	
+	"OngoingDay"
+	{
+		"en"			"Only one day can be active at a time!"
+	}
+}

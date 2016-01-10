@@ -1,0 +1,94 @@
+"Phrases"
+{
+	"BecomeWarden1"
+	{
+		"sv"			"Skriv !w igen för att öppna din warden meny!"
+	}
+	
+	"BecomeWarden2"
+	{
+		"sv"			"Skriv !uw för att avgå från warden positionen!"
+	}
+	
+	"BecomeWarden3"
+	{
+		"#format"		"{1:s}"
+		"sv"			"{1} har blivit warden!"
+	}
+	
+	"BecomeWarden_Denied1"
+	{
+		"sv"			"Döda spelare kan inte bli warden!"
+	}
+	
+	"BecomeWarden_Denied2"
+	{
+		"sv"			"Endast anti-terrorister kan bli warden!"
+	}
+	
+	"CurrentWarden"
+	{
+		"#format"		"{1:s}"
+		"sv"			"Nuvarande warden är: {1}"
+	}
+	
+	"ResignWarden1"
+	{
+		"#format"		"{1:s}"
+		"sv"			"{1} har sagt upp sig!"
+	}
+	
+	"ResignWarden2"
+	{
+		"sv"			"Du är inte warden!"
+	}
+	
+	"RemoveWarden2"
+	{
+		"#format"		"{1:s}"
+		"sv"			"{1} Har fått sparken!"
+	}
+	
+	"RemoveWarden1"
+	{
+		"#format"		"{1:s}"
+		"sv"			"{1} fick sparken!"
+	}
+	
+	"WardenLeft"
+	{
+		"#format"		"{1:s}"
+		"sv"			"{1} har lämnat!"
+	}
+	
+	"WardenDead"
+	{
+		"#format"		"{1:s}"
+		"sv"			"{1} har dött!"
+	}
+	
+	"WardenMenuTitle"
+	{
+		"sv"			"Warden Meny"
+	}
+	
+	"WardenMenuDays"
+	{
+		"sv"			"Dagar"
+	}
+	
+	"WardenMenuGames"
+	{
+		"sv"			"Lekar"
+	}
+	
+	"WardenMenuOther"
+	{
+		"sv"			"Annat"
+	}
+	
+	"OngoingDay"
+	{
+		"sv"			"Endast en dag kan vara aktiv åt gången!"
+	}
+}
