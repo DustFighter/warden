@@ -33,9 +33,9 @@ public Plugin myinfo =
 {
 	name = "Warden Core",
 	author = "Godis",
-	description = "Modular JailBreak plugin",
+	description = "A modular JailBreak plugin for SourceMod",
 	version = kWardenVersion,
-	url = "www.github.com/godisfarfar"
+	url = "https://github.com/godisfarfar/warden"
 };
 
 public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max)
@@ -52,9 +52,9 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
 public void OnPluginStart()
 {
 	EngineVersion game_engine = GetEngineVersion();
-	if((game_engine != Engine_CSS) && (game_engine != Engine_CSGO))
+	if((game_engine != Engine_CSS) && (game_engine != Engine_CSGO) && (game_engine != Engine_TF2))
 	{
-		SetFailState("Game is not supported");
+		SetFailState("This game is not supported");
 	}
 	
 	CreateConVar("sm_warden_core_version", kWardenVersion, "Warden Core version", FCVAR_DONTRECORD);
@@ -410,7 +410,7 @@ public int Native_FindItem(Handle plugin, int params)
 public int Native_SetWarden(Handle plugin, int params)
 {
 	int client = GetNativeCell(1);
-	if(client < 1 || client > MaxClients || !IsClientInGame(client))
+	if((client < 1) || (client > MaxClients) || !IsClientInGame(client))
 	{
 		ThrowNativeError(SP_ERROR_NATIVE, "Client index %i is invalid.", client);
 	}
@@ -444,7 +444,7 @@ int[] UpdateRenderColor(const char[] str)
 	return rgb;
 }
 
-void StartForward(int client, Handle &fwd)
+void StartForward(int client, Handle fwd)
 {
 	Call_StartForward(fwd);
 	Call_PushCell(client);
