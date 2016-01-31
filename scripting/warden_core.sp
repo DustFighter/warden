@@ -16,10 +16,14 @@ enum Item
 const int kMaxItems = 32;
 
 int g_warden = -1;
+int g_color[3];
 int g_menu_item[kMaxItems][Item];
 int g_menu_item_count[Warden_MenuCategory];
 int g_menu_item_count_total;
-int g_color[3];
+int g_menu_item_pos_exit;
+int g_menu_item_pos_days;
+int g_menu_item_pos_games;
+int g_menu_item_pos_other;
 
 bool g_day;
 
@@ -28,6 +32,7 @@ Handle g_fwd_removed = null;
 
 ConVar g_cvar_enable_menu = null;
 ConVar g_cvar_render_color = null;
+ConVar g_cvar_mode = null;
 
 public Plugin myinfo =
 {
@@ -51,14 +56,23 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
 
 public void OnPluginStart()
 {
-	EngineVersion game_engine = GetEngineVersion();
-	if((game_engine != Engine_CSS) && (game_engine != Engine_CSGO) && (game_engine != Engine_TF2))
+	EngineVersion game = GetEngineVersion();
+	if((game != Engine_CSS) && (game != Engine_CSGO) && (game != Engine_TF2))
 	{
 		SetFailState("This game is not supported");
 	}
+	if(game == Engine_CSGO)
+	{
+		g_menu_item_pos_exit = 9;
+	}
+	else
+	{
+		g_menu_item_pos_exit = 10;
+	}
 	
-	CreateConVar("sm_warden_core_version", kWardenVersion, "Warden Core version", FCVAR_DONTRECORD);
+	CreateConVar("sm_warden_core_version", kWardenVersion, "Warden Core version", FCVAR_NOTIFY|FCVAR_DONTRECORD);
 	g_cvar_enable_menu = CreateConVar("sm_warden_core_enable_menu", "1", "Enable the warden menu.");
+	g_cvar_mode = CreateConVar("sm_warden_core_mode", "1", "1 - First guard to use sm_w. 2 - Random guard selected at round start.");
 	g_cvar_render_color = CreateConVar("sm_warden_core_render_color", "0,0,255", "RGB color code, modifies the wardens model color.");
 	
 	char buffer[32];
@@ -84,18 +98,20 @@ public void OnPluginStart()
 	HookEvent("player_death", Event_PlayerDeath, EventHookMode_Post);
 	
 	LoadTranslations("warden_core.phrases");
+	LoadTranslations("core.phrases");
 }
 
 public void OnClientDisconnect(int client)
 {
 	if(g_warden == client)
 	{
+		StartForward(g_warden, g_fwd_removed);
+		
 		char warden_name[MAX_NAME_LENGTH];
 		GetClientName(client, warden_name, sizeof(warden_name));
 		
 		PrintCenterTextAll("%t", "WardenLeft", warden_name);
 		
-		StartForward(g_warden, g_fwd_removed);
 		g_warden = -1;
 	}
 }
@@ -128,8 +144,8 @@ public Action Cmd_Warden(int client, int args)
 				GetClientName(client, warden_name, sizeof(warden_name));
 				
 				g_warden = client;
-				SetEntityRenderColor(client, g_color[0], g_color[1], g_color[2], 255);
 				StartForward(client, g_fwd_created);
+				SetEntityRenderColor(client, g_color[0], g_color[1], g_color[2], 255);
 				
 				PrintCenterTextAll("%t", "BecomeWarden3", warden_name);
 				
@@ -155,7 +171,7 @@ public Action Cmd_Warden(int client, int args)
 	}
 	else
 	{
-		if((g_warden == client) && (g_cvar_enable_menu.IntValue == 1))
+		if((g_warden == client) && (g_cvar_enable_menu.IntValue == 1) && (g_menu_item_count_total > 0))
 		{
 			Menu1(client);
 			return Plugin_Handled;
@@ -175,10 +191,11 @@ public Action Cmd_UnWarden(int client, int args)
 {
 	if(g_warden == client)
 	{
+		StartForward(g_warden, g_fwd_removed);
+		
 		char warden_name[MAX_NAME_LENGTH];
 		GetClientName(client, warden_name, sizeof(warden_name));
 		
-		StartForward(g_warden, g_fwd_removed);
 		SetEntityRenderColor(g_warden, 255, 255, 255, 255);
 		g_warden = -1;
 		
@@ -206,6 +223,30 @@ public Action Event_RoundStart(Event event, const char[] command, bool dontBroad
 		g_warden = -1;
 	}
 	
+	if(g_cvar_mode.IntValue == 1)
+	{
+		PrintToChatGuards("[Warden] %t", "BecomeWarden4");
+	}
+	
+	if(g_cvar_mode.IntValue == 2)
+	{
+		g_warden = GetRandomGuard();
+		StartForward(g_warden, g_fwd_created);
+		SetEntityRenderColor(g_warden, g_color[0], g_color[1], g_color[2], 255);
+		
+		char warden_name[MAX_NAME_LENGTH];
+		GetClientName(g_warden, warden_name, sizeof(warden_name));
+		
+		PrintCenterTextAll("%t", "BecomeWarden3", warden_name);
+		
+		if((g_cvar_enable_menu.IntValue == 1) && (g_menu_item_count_total > 0))
+		{
+			PrintToChat(g_warden, "[Warden] %t", "BecomeWarden1");
+		}
+		
+		PrintToChat(g_warden, "[Warden] %t", "BecomeWarden2");
+	}
+	
 	if(g_day)
 	{
 		g_day = false;
@@ -216,12 +257,13 @@ public Action Event_PlayerDeath(Event event, const char[] command, bool dontBroa
 {
 	if(g_warden == GetClientOfUserId(event.GetInt("userid")))
 	{
-		char warden_name[MAX_NAME_LENGTH];
-		GetClientName(g_warden, warden_name, sizeof(warden_name));
-		
 		StartForward(g_warden, g_fwd_removed);
 		
+		char warden_name[MAX_NAME_LENGTH];
+		GetClientName(g_warden, warden_name, sizeof(warden_name));	
+		
 		PrintCenterTextAll("%t", "WardenDead", warden_name);
+		PrintToChatGuards("[Warden] %t", "BecomeWarden4");
 		
 		g_warden = -1;
 	}
@@ -231,31 +273,41 @@ public int MenuHandler(Menu menu, MenuAction action, int param1, int param2)
 {
 	if(action == MenuAction_Select)
 	{
-		char info[32];
-		menu.GetItem(param2, info, sizeof(info));
+		if(param1 != g_warden)
+		{
+			return;
+		}
 		
-		if(StrEqual(info, "days"))
+		if(menu == null)
 		{
-			Menu2(param1, Warden_MenuCategoryDays);
-		}
-		else if(StrEqual(info, "games"))
-		{
-			Menu2(param1, Warden_MenuCategoryGames);
-		}
-		else if(StrEqual(info, "other"))
-		{
-			Menu2(param1, Warden_MenuCategoryOther);
+			if(param2 == g_menu_item_pos_days)
+			{
+				if(!g_day)
+				{
+					Menu2(param1, Warden_MenuCategoryDays);
+				}
+				else
+				{
+					PrintToChat(param1, "[Warden] %t", "OngoingDay");
+				}
+			}
+			else if(param2 == g_menu_item_pos_games)
+			{
+				Menu2(param1, Warden_MenuCategoryGames);
+			}
+			else if(param2 == g_menu_item_pos_other)
+			{
+				Menu2(param1, Warden_MenuCategoryOther);
+			}
 		}
 		else
 		{
+			char info[32];
+			menu.GetItem(param2, info, sizeof(info));
+			
 			int item = StringToInt(info);
 			if((g_menu_item[item][Category] == Warden_MenuCategoryDays))
 			{
-				if(g_day)
-				{
-					PrintToChat(param1, "[Warden] %t", "OngoingDay");
-					return;
-				}
 				g_day = true;
 			}
 			
@@ -280,28 +332,54 @@ public int MenuHandler(Menu menu, MenuAction action, int param1, int param2)
 
 void Menu1(int client)
 {
-	Menu menu = new Menu(MenuHandler);
-	menu.SetTitle("%t", "WardenMenuTitle");
+	Panel panel = new Panel(null);
 	
 	char buffer[32];
+	Format(buffer, sizeof(buffer), "%t", "WardenMenuTitle");
+	panel.SetTitle(buffer);
+	
 	if(g_menu_item_count[Warden_MenuCategoryDays] > 0)
 	{
 		Format(buffer, sizeof(buffer), "%t", "WardenMenuDays");
-		menu.AddItem("days", buffer);
+		g_menu_item_pos_days = panel.DrawItem(buffer);
 	}
-	if(g_menu_item_count[Warden_MenuCategoryGames] > 0)
+	else
 	{
-		Format(buffer, sizeof(buffer), "%t", "WardenMenuGames");
-		menu.AddItem("games", buffer);
-	}
-	if(g_menu_item_count[Warden_MenuCategoryOther] > 0)
-	{
-		Format(buffer, sizeof(buffer), "%t", "WardenMenuOther");
-		menu.AddItem("other", buffer);
+		Format(buffer, sizeof(buffer), "1. %t", "WardenMenuDays");
+		panel.DrawText(buffer);
 	}
 	
-	menu.ExitButton = true;
-	menu.Display(client, 20);
+	if(g_menu_item_count[Warden_MenuCategoryGames] > 0)
+	{
+		panel.CurrentKey = 2;
+		Format(buffer, sizeof(buffer), "%t", "WardenMenuGames");
+		g_menu_item_pos_games = panel.DrawItem(buffer);
+	}
+	else
+	{
+		Format(buffer, sizeof(buffer), "2. %t", "WardenMenuGames");
+		panel.DrawText(buffer);
+	}
+	
+	if(g_menu_item_count[Warden_MenuCategoryOther] > 0)
+	{
+		panel.CurrentKey = 3;
+		Format(buffer, sizeof(buffer), "%t", "WardenMenuOther");
+		g_menu_item_pos_other = panel.DrawItem(buffer);
+	}
+	else
+	{
+		Format(buffer, sizeof(buffer), "3. %t", "WardenMenuOther");
+		panel.DrawText(buffer);
+	}
+	
+	panel.DrawText(" ");
+	panel.CurrentKey = g_menu_item_pos_exit;
+	
+	Format(buffer, sizeof(buffer), "%t", "Exit");
+	panel.DrawItem(buffer);
+	
+	panel.Send(client, MenuHandler, MENU_TIME_FOREVER);
 }
 
 void Menu2(int client, Warden_MenuCategory category)
@@ -321,15 +399,15 @@ void Menu2(int client, Warden_MenuCategory category)
 	}
 	
 	menu.ExitBackButton = true;
-	menu.Display(client, 20);
+	menu.Display(client, MENU_TIME_FOREVER);
 }
 
 void Perform_RemoveWarden(int client)
 {
+	StartForward(g_warden, g_fwd_removed);
+	
 	char warden_name[MAX_NAME_LENGTH];
 	GetClientName(g_warden, warden_name, sizeof(warden_name));
-	
-	StartForward(g_warden, g_fwd_removed);
 	
 	PrintCenterTextAll("%t", "RemoveWarden1", warden_name);
 	
@@ -418,9 +496,9 @@ public int Native_SetWarden(Handle plugin, int params)
 	StartForward(g_warden, g_fwd_removed);
 	SetEntityRenderColor(g_warden, 255, 255, 255, 255);
 	
-	g_warden = client;
-	
 	StartForward(client, g_fwd_created);
+	
+	g_warden = client;
 	SetEntityRenderColor(client, g_color[0], g_color[1], g_color[2], 255);
 }
 
@@ -442,6 +520,37 @@ int[] UpdateRenderColor(const char[] str)
 	}
 	
 	return rgb;
+}
+
+int GetRandomGuard()
+{
+	int[] client = new int[MaxClients+1];
+	int count;
+	
+	for(int i = 1; i <= MaxClients; i++)
+	{
+		if(IsClientInGame(i) && IsPlayerAlive(i) && (GetClientTeam(i) == 3))
+		{
+			client[count+1] = i;
+			count++;
+		}
+	}
+	
+	return client[GetRandomInt(1, count)];
+}
+
+void PrintToChatGuards(const char[] format, any ...)
+{
+	char buffer[192];
+	VFormat(buffer, sizeof(buffer), format, 2);
+	
+	for(int i = 1; i <= MaxClients; i++)
+	{
+		if(IsClientInGame(i) && IsPlayerAlive(i) && (GetClientTeam(i) == 3))
+		{
+			PrintToChat(i, buffer);
+		}
+	}
 }
 
 void StartForward(int client, Handle fwd)

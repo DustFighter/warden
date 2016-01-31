@@ -16,6 +16,11 @@
 		"en"			"{1} has become warden!"
 	}
 	
+	"BecomeWarden4"
+	{
+		"en"			"Type !w to become warden!"
+	}
+	
 	"BecomeWarden_Denied1"
 	{
 		"en"			"Dead players can not become warden!"
@@ -47,12 +52,6 @@
 	{
 		"#format"		"{1:s}"
 		"en"			"{1} has been fired!"
-	}
-	
-	"RemoveWarden_CSGO"
-	{
-		"#format"		"{1:s}"
-		"en"			"<font color='#33CC33'>{1}</font> has been fired!"
 	}
 	
 	"RemoveWarden1"

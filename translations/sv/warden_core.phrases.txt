@@ -16,6 +16,11 @@
 		"sv"			"{1} har blivit warden!"
 	}
 	
+	"BecomeWarden4"
+	{
+		"sv"			"Skriv !w för att bli warden!"
+	}
+	
 	"BecomeWarden_Denied1"
 	{
 		"sv"			"Döda spelare kan inte bli warden!"
