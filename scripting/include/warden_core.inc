@@ -5,7 +5,7 @@
 
 public const char kWardenVersion[] = "1.0.0";
 
-typedef Warden_MenuCallback = function void(int client, const char[] info);
+typedef Warden_MenuCallback = function void(int client, int item);
 
 enum Warden_MenuCategory
 {
@@ -17,14 +17,13 @@ enum Warden_MenuCategory
 /**
  * Add a new item to the main menu.
  *
- * @param info			Info string passed in the callback.
- * @param display		Item name in the menu.
+ * @param name			Item display name.
  * @param category		Item category.
  * @param callback		Callback to when the item is selected.
  *
  * @return				Item id (-1 if the item could not be added).
  */
-native int Warden_RegisterItem(const char[] info, const char[] display, Warden_MenuCategory category, Warden_MenuCallback callback);
+native int Warden_RegisterItem(const char[] name, Warden_MenuCategory category, Warden_MenuCallback callback);
 
 /**
  * Remove an item from the main menu.
@@ -36,21 +35,11 @@ native int Warden_RegisterItem(const char[] info, const char[] display, Warden_M
 native void Warden_DeregisterItem(int item);
 
 /**
- * Retrieve the id of an item given the item display name and category.
- *
- * @param display		Item display name.
- * @param category		Item category.
- *
- * @return				Item id (-1 if the item was not found).
- */
-native int Warden_FindItem(const char[] display, Warden_MenuCategory category);
-
-/**
  * Get the current warden.
  *
  * @return				Client index (-1 if no warden).
  */
-native int Warden_Get();
+native int GetWarden();
 
 /**
  * Set the current warden.
@@ -59,7 +48,7 @@ native int Warden_Get();
  *
  * @noreturn
  */
-native void Warden_Set(int client);
+native void SetWarden(int client);
 
 /**
  * Called when someone becomes warden.
@@ -95,7 +84,6 @@ public __pl_warden_core_SetNTVOptional()
 {
 	MarkNativeAsOptional("Warden_RegisterItem");
 	MarkNativeAsOptional("Warden_DeregisterItem");
-	MarkNativeAsOptional("Warden_FindItem");
-	MarkNativeAsOptional("Warden_Set");
-	MarkNativeAsOptional("Warden_Get");
+	MarkNativeAsOptional("SetWarden");
+	MarkNativeAsOptional("GetWarden");
 }

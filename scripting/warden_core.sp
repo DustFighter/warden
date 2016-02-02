@@ -6,8 +6,7 @@
 
 enum Item
 {
-	String:Display[32],
-	String:Info[32],
+	String:Name[32],
 	Warden_MenuCategory:Category,
 	Warden_MenuCallback:Callback,
 	Handle:Owner,
@@ -47,9 +46,8 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
 {
 	CreateNative("Warden_RegisterItem", Native_RegisterItem);
 	CreateNative("Warden_DeregisterItem", Native_DeregisterItem);
-	CreateNative("Warden_FindItem", Native_FindItem);
-	CreateNative("Warden_Set", Native_SetWarden);
-	CreateNative("Warden_Get", Native_GetWarden);
+	CreateNative("SetWarden", Native_SetWarden);
+	CreateNative("GetWarden", Native_GetWarden);
 	RegPluginLibrary("warden_core");
 	return APLRes_Success;
 }
@@ -302,18 +300,18 @@ public int MenuHandler(Menu menu, MenuAction action, int param1, int param2)
 		}
 		else
 		{
-			char info[32];
-			menu.GetItem(param2, info, sizeof(info));
+			char buffer[32];
+			menu.GetItem(param2, buffer, sizeof(buffer));
 			
-			int item = StringToInt(info);
-			if((g_menu_item[item][Category] == Warden_MenuCategoryDays))
+			int id = StringToInt(buffer);
+			if((g_menu_item[id][Category] == Warden_MenuCategoryDays))
 			{
 				g_day = true;
 			}
 			
-			Call_StartFunction(g_menu_item[item][Owner], view_as<Function>(g_menu_item[item][Callback]));
+			Call_StartFunction(g_menu_item[id][Owner], view_as<Function>(g_menu_item[id][Callback]));
 			Call_PushCell(param1);
-			Call_PushString(g_menu_item[item][Info]);
+			Call_PushCell(id);
 			Call_Finish();
 		}
 	}
@@ -387,14 +385,13 @@ void Menu2(int client, Warden_MenuCategory category)
 	Menu menu = new Menu(MenuHandler);
 	menu.SetTitle("%t", "WardenMenuTitle");
 	
+	char buffer[32];
 	for(int i = 0; i < kMaxItems; i++)
 	{
 		if((g_menu_item[i][Category] == category) && (g_menu_item[i][Owner] != null))
 		{
-			char buffer[32];
 			IntToString(i, buffer, sizeof(buffer));
-			
-			menu.AddItem(buffer, g_menu_item[i][Display]);
+			menu.AddItem(buffer, g_menu_item[i][Name]);
 		}
 	}
 	
@@ -420,69 +417,44 @@ void Perform_RemoveWarden(int client)
 
 public int Native_RegisterItem(Handle plugin, int params)
 {
-	char info[32];
-	GetNativeString(1, info, sizeof(info));
+	char name[32];
+	GetNativeString(1, name, sizeof(name));
 	
-	char display[32];
-	GetNativeString(2, display, sizeof(display));
-	
-	int item = -1;
+	int id = -1;
 	
 	for (int i = 0; i < kMaxItems; i++)
 	{
 		if(g_menu_item[i][Owner] == null)
 		{
-			Format(g_menu_item[i][Info], 32, info);
-			Format(g_menu_item[i][Display], 32, display);
-			g_menu_item[i][Category] = view_as<Warden_MenuCategory>(GetNativeCell(3));
-			g_menu_item[i][Callback] = GetNativeCell(4);
+			Format(g_menu_item[i][Name], 32, name);
+			g_menu_item[i][Category] = view_as<Warden_MenuCategory>(GetNativeCell(2));
+			g_menu_item[i][Callback] = GetNativeCell(3);
 			g_menu_item[i][Owner] = plugin;
 			
 			g_menu_item_count[ g_menu_item[i][Category] ]++;
 			g_menu_item_count_total++;
-			
-			item = i;
-			
+			id = i;
 			break;
 		}
 	}
 	
-	return item;
+	return id;
 }
 
 public int Native_DeregisterItem(Handle plugin, int params)
 {
-	int item = GetNativeCell(1);
+	int id = GetNativeCell(1);
 	
-	if((item >= 0) && (item < kMaxItems) && (g_menu_item[item][Owner] != null))
+	if((id >= 0) && (id < kMaxItems) && (g_menu_item[id][Owner] != null))
 	{
 		g_menu_item_count_total--;
-		g_menu_item_count[ g_menu_item[item][Category] ]--;
-		g_menu_item[item][Owner] = null;
+		g_menu_item_count[ g_menu_item[id][Category] ]--;
+		g_menu_item[id][Owner] = null;
 	}
 	else
 	{
-		ThrowNativeError(SP_ERROR_NATIVE, "Item with id \"%i\" does not exist!", item);
+		ThrowNativeError(SP_ERROR_NATIVE, "Item with id \"%i\" does not exist!", id);
 	}
-}
-
-public int Native_FindItem(Handle plugin, int params)
-{
-	char display[32];
-	GetNativeString(1, display, sizeof(display));
-	
-	Warden_MenuCategory category;
-	category = view_as<Warden_MenuCategory>(GetNativeCell(2));
-	
-	for(int i = 0; i < kMaxItems; i++)
-	{
-		if(StrEqual(g_menu_item[i][Display], display) && (g_menu_item[i][Category] == category))
-		{
-			return i;
-		}
-	}
-	
-	return -1;
 }
 
 public int Native_SetWarden(Handle plugin, int params)
