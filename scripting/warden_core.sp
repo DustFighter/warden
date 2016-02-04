@@ -128,7 +128,7 @@ public Action Cmd_Warden(int client, int args)
 {
 	if(client == 0)
 	{
-		PrintToServer("[warden_core.smx] This command can only be used in-game.");
+		PrintToServer("[warden_core.smx] %t", "PlayerCMD");
 		return Plugin_Handled;
 	}
 	
