@@ -96,4 +96,8 @@
 	{
 		"sv"			"Endast en dag kan vara aktiv åt gången!"
 	}
+	"PlayerCMD"
+	{
+		"sv"			"Detta kommandot går endast använda i spelet."
+	}
 }
