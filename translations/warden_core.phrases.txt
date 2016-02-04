@@ -96,4 +96,9 @@
 	{
 		"en"			"Only one day can be active at a time!"
 	}
+	
+	"PlayerCMD"
+	{
+		"en"			"This command can only be used in-game."
+	}
 }
