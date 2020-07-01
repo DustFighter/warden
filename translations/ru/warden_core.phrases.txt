@@ -1,0 +1,104 @@
+"Phrases"
+{
+	"BecomeWarden1"
+	{
+		"ru"			"Напишите !w снова, чтобы открыть меню надзирателя!"
+	}
+	
+	"BecomeWarden2"
+	{
+		"ru"			"Напишите !uw чтобы уйти в отставку с должности надзирателя!"
+	}
+	
+	"BecomeWarden3"
+	{
+		"#format"		"{1:s}"
+		"ru"			"{1} стал надзирателем!"
+	}
+	
+	"BecomeWarden4"
+	{
+		"ru"			"Напишите !w чтобы стать надзирателем!"
+	}
+	
+	"BecomeWarden_Denied1"
+	{
+		"ru"			"Мёртвые игроки не могут стать надзирателями!"
+	}
+	
+	"BecomeWarden_Denied2"
+	{
+		"ru"			"Только спецназ могут стать надзирателями!"
+	}
+	
+	"CurrentWarden"
+	{
+		"#format"		"{1:s}"
+		"ru"			"Текущий надзиратель: {1}"
+	}
+	
+	"ResignWarden1"
+	{
+		"#format"		"{1:s}"
+		"ru"			"{1} подал в отставку!"
+	}
+	
+	"ResignWarden2"
+	{
+		"ru"			"Вы не надзиратель!"
+	}
+	
+	"RemoveWarden2"
+	{
+		"#format"		"{1:s}"
+		"ru"			"{1} был уволен!"
+	}
+	
+	"RemoveWarden1"
+	{
+		"#format"		"{1:s}"
+		"ru"			"{1} был уволен!"
+	}
+	
+	"WardenLeft"
+	{
+		"#format"		"{1:s}"
+		"ru"			"{1} покинул игру!"
+	}
+	
+	"WardenDead"
+	{
+		"#format"		"{1:s}"
+		"ru"			"{1} умер!"
+	}
+	
+	"WardenMenuTitle"
+	{
+		"ru"			"Меню надзирателя"
+	}
+	
+	"WardenMenuDays"
+	{
+		"ru"			"Дни"
+	}
+	
+	"WardenMenuGames"
+	{
+		"ru"			"Игры"
+	}
+	
+	"WardenMenuOther"
+	{
+		"ru"			"Другое"
+	}
+	
+	"OngoingDay"
+	{
+		"ru"			"Только один день может быть активным одновременно!"
+	}
+	
+	"PlayerCMD"
+	{
+		"ru"			"Эта команда может быть использована только в игре."
+	}
+}
